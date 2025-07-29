@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Member Details: {{ member.username }}{% endblock %}
+
+{% block content %}
+<div>
+  <!-- Page Header -->
+  <div>
+    <a href="{% url 'members' %}" class="text-sm text-indigo-600 dark:text-indigo-400 hover:underline mb-4 inline-block">← Back to All Members</a>
+    <div class="flex items-center space-x-4">
+      
+      <!-- === THE FIX === -->
+      {% if member.profile_picture %}
+        <img class="h-16 w-16 rounded-full" src="{{ member.profile_picture.url }}" alt="Profile picture of {{ member.username }}">
+      {% else %}
+        <img class="h-16 w-16 rounded-full" src="{% static 'images/default_avatar.png' %}" alt="Default profile picture">
+      {% endif %}
+      <!-- === END OF FIX === -->
+      
+      <div>
+        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">{{ member.get_full_name|default:member.username }}</h1>
+        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">{{ member.email }} · {{ member.center.name|default:'No Center' }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ... (Rest of the file remains the same: Stats Grid, Chart, etc.) ... -->
+  <div class="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2">
+    <!-- Stats cards here -->
+  </div>
+  <div class="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <!-- Chart and Recent Activity here -->
+  </div>
+</div>
+
+<script>
+  // Your chart script remains the same
+</script>
+{% endblock %}

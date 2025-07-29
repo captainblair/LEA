@@ -1,0 +1,110 @@
+{% load static %}
+<nav x-data="{ open: false }" class="bg-white dark:bg-gray-800 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between h-16">
+            <div class="flex">
+                <div class="flex-shrink-0 flex items-center">
+                    <!-- Your Logo -->
+                    <a href="{% url 'home' %}" class="text-xl font-bold text-indigo-600 dark:text-indigo-400">
+                        LEA System
+                    </a>
+                </div>
+                <div class="hidden sm:-my-px sm:ml-6 sm:flex sm:space-x-8">
+                    <!-- ADMIN-ONLY LINKS -->
+                    {% if user.is_authenticated and user.is_admin %}
+                        <a href="{% url 'admin_dashboard' %}" class="inline-flex items-center px-1 pt-1 border-b-2 {% if request.resolver_match.url_name == 'admin_dashboard' %}border-indigo-500 text-gray-900 dark:text-white{% else %}border-transparent text-gray-500 dark:text-gray-400 hover:border-gray-300 hover:text-gray-700{% endif %} text-sm font-medium"> Admin Dashboard </a>
+                        <a href="{% url 'members' %}" class="inline-flex items-center px-1 pt-1 border-b-2 {% if request.resolver_match.url_name == 'members' or request.resolver_match.url_name == 'admin_member_detail' %}border-indigo-500 text-gray-900 dark:text-white{% else %}border-transparent text-gray-500 dark:text-gray-400 hover:border-gray-300 hover:text-gray-700{% endif %} text-sm font-medium"> Manage Members </a>
+                        <a href="{% url 'reports' %}" class="inline-flex items-center px-1 pt-1 border-b-2 {% if request.resolver_match.url_name == 'reports' %}border-indigo-500 text-gray-900 dark:text-white{% else %}border-transparent text-gray-500 dark:text-gray-400 hover:border-gray-300 hover:text-gray-700{% endif %} text-sm font-medium"> Reports </a>
+                    
+                    <!-- MEMBER-ONLY LINKS -->
+                    {% elif user.is_authenticated %}
+                        <a href="{% url 'dashboard' %}" class="inline-flex items-center px-1 pt-1 border-b-2 {% if request.resolver_match.url_name == 'dashboard' %}border-indigo-500 text-gray-900 dark:text-white{% else %}border-transparent text-gray-500 dark:text-gray-400 hover:border-gray-300 hover:text-gray-700{% endif %} text-sm font-medium"> Dashboard </a>
+                        <a href="{% url 'attendance' %}" class="inline-flex items-center px-1 pt-1 border-b-2 {% if request.resolver_match.url_name == 'attendance' %}border-indigo-500 text-gray-900 dark:text-white{% else %}border-transparent text-gray-500 dark:text-gray-400 hover:border-gray-300 hover:text-gray-700{% endif %} text-sm font-medium"> Attendance </a>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="hidden sm:ml-6 sm:flex sm:items-center">
+                <!-- Dark Mode Toggle -->
+                <button @click="darkMode = !darkMode" class="p-2 rounded-full text-gray-400 hover:text-gray-500 dark:hover:text-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    <i class="fas fa-sun" x-show="!darkMode"></i>
+                    <i class="fas fa-moon" x-show="darkMode"></i>
+                </button>
+
+                <!-- Profile dropdown -->
+                {% if user.is_authenticated %}
+                <div x-data="{ profileOpen: false }" @click.away="profileOpen = false" class="ml-3 relative">
+                    <div>
+                        <button @click="profileOpen = !profileOpen" type="button" class="bg-white dark:bg-gray-800 flex text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" id="user-menu-button" aria-expanded="false" aria-haspopup="true">
+                            <span class="sr-only">Open user menu</span>
+
+                            <!-- ======================================================= -->
+                            <!-- THE ONLY CHANGE IS HERE: This block safely handles the image -->
+                            <!-- ======================================================= -->
+                            {% if user.profile_picture %}
+                                <img class="h-8 w-8 rounded-full object-cover" src="{{ user.profile_picture.url }}" alt="User Profile">
+                            {% else %}
+                                <img class="h-8 w-8 rounded-full object-cover" src="{% static 'images/default_avatar.png' %}" alt="Default User Profile">
+                            {% endif %}
+                            <!-- ======================================================= -->
+                            <!-- END OF THE CHANGE -->
+                            <!-- ======================================================= -->
+
+                        </button>
+                    </div>
+                    <div 
+                        x-show="profileOpen" 
+                        x-transition:enter="transition ease-out duration-200"
+                        x-transition:enter-start="transform opacity-0 scale-95"
+                        x-transition:enter-end="transform opacity-100 scale-100"
+                        x-transition:leave="transition ease-in duration-75"
+                        x-transition:leave-start="transform opacity-100 scale-100"
+                        x-transition:leave-end="transform opacity-0 scale-95"
+                        class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white dark:bg-gray-700 ring-1 ring-black ring-opacity-5 focus:outline-none" role="menu" aria-orientation="vertical" aria-labelledby="user-menu-button" tabindex="-1"
+                        style="display: none;">
+                        <a href="{% url 'profile' %}" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600" role="menuitem" tabindex="-1">Your Profile</a>
+                        {% if user.is_admin %}
+                        <a href="{% url 'settings' %}" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600" role="menuitem" tabindex="-1">Settings</a>
+                        {% endif %}
+                        <form method="post" action="{% url 'logout' %}">
+                            {% csrf_token %}
+                            <button type="submit" class="w-full text-left block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600" role="menuitem" tabindex="-1">Sign out</button>
+                        </form>
+                    </div>
+                </div>
+                {% else %}
+                <!-- Login/Signup for guests -->
+                <a href="{% url 'login' %}" class="ml-4 whitespace-nowrap inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-indigo-600 hover:bg-indigo-700"> Sign in </a>
+                <a href="{% url 'signup' %}" class="ml-4 text-base font-medium text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"> Sign up </a>
+                {% endif %}
+            </div>
+            <!-- Mobile menu button -->
+            <div class="-mr-2 flex items-center sm:hidden">
+                <button @click="open = !open" type="button" class="bg-white dark:bg-gray-800 inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" aria-controls="mobile-menu" aria-expanded="false">
+                    <span class="sr-only">Open main menu</span>
+                    <i class="fas fa-bars block h-6 w-6" :class="{'hidden': open, 'block': !open }"></i>
+                    <i class="fas fa-times hidden h-6 w-6" :class="{'block': open, 'hidden': !open }"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile menu, show/hide based on menu state. -->
+    <div class="sm:hidden" id="mobile-menu" x-show="open"
+        x-transition:enter="transition ease-out duration-200"
+        x-transition:enter-start="opacity-0"
+        x-transition:enter-end="opacity-100"
+        x-transition:leave="transition ease-in duration-75"
+        x-transition:leave-start="opacity-100"
+        x-transition:leave-end="opacity-0">
+        <div class="pt-2 pb-3 space-y-1">
+            <!-- Mobile Links -->
+            {% if user.is_authenticated and user.is_admin %}
+                <a href="{% url 'admin_dashboard' %}" class="block pl-3 pr-4 py-2 border-l-4 border-indigo-500 text-base font-medium text-indigo-700 bg-indigo-50 dark:bg-gray-700 dark:text-white">Admin Dashboard</a>
+                <a href="{% url 'members' %}" class="block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800 dark:text-gray-300 dark:hover:bg-gray-700">Manage Members</a>
+            {% elif user.is_authenticated %}
+                <a href="{% url 'dashboard' %}" class="block pl-3 pr-4 py-2 border-l-4 border-indigo-500 text-base font-medium text-indigo-700 bg-indigo-50 dark:bg-gray-700 dark:text-white">Dashboard</a>
+                <a href="{% url 'attendance' %}" class="block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800 dark:text-gray-300 dark:hover:bg-gray-700">Attendance</a>
+            {% endif %}
+        </div>
+    </div>
+</nav>

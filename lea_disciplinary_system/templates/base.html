@@ -1,0 +1,55 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" class="h-full" x-data="{ darkMode: localStorage.getItem('darkMode') === 'true' }" 
+      :class="{ 'dark': darkMode }" x-init="$watch('darkMode', value => localStorage.setItem('darkMode', value))">
+<head>
+    <meta charset="UTF-8">
+    <!-- This viewport tag is essential for mobile responsiveness -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>LEA System | {% block title %}Home{% endblock %}</title>
+    
+    <!-- CSS is loaded first for fast visual rendering -->
+    <!-- Make sure you have run `python manage.py collectstatic` and your web server is configured to serve from the STATIC_ROOT -->
+    <link href="{% static 'css/output.css' %}" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    
+    {% block extra_head %}{% endblock %}
+</head>
+<body class="h-full bg-gray-100 dark:bg-gray-900 font-sans antialiased text-gray-800 dark:text-gray-200">
+    <div class="min-h-full">
+        
+        <!-- The navigation bar is included here. All the logic for showing/hiding links is inside this partial file. -->
+        {% include 'partials/navbar.html' %}
+        
+        <main class="py-8">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <!-- Django Messages Framework: Displays success/error/warning messages -->
+                {% if messages %}
+                    <div class="space-y-4 mb-6">
+                    {% for message in messages %}
+                        <div class="rounded-md p-4
+                            {% if message.tags == 'success' %} bg-green-100 dark:bg-green-800/20 border border-green-400 dark:border-green-600/30 text-green-800 dark:text-green-200 {% endif %}
+                            {% if message.tags == 'warning' %} bg-yellow-100 dark:bg-yellow-800/20 border border-yellow-400 dark:border-yellow-600/30 text-yellow-800 dark:text-yellow-200 {% endif %}
+                            {% if message.tags == 'error' %} bg-red-100 dark:bg-red-800/20 border border-red-400 dark:border-red-600/30 text-red-800 dark:text-red-200 {% endif %}
+                            {% if message.tags == 'info' %} bg-blue-100 dark:bg-blue-800/20 border border-blue-400 dark:border-blue-600/30 text-blue-800 dark:text-blue-200 {% endif %}
+                        " role="alert">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                    </div>
+                {% endif %}
+
+                <!-- The main content for each specific page will be injected here -->
+                {% block content %}{% endblock %}
+            </div>
+        </main>
+    </div>
+
+    <!-- Scripts are moved to the end of the body for faster page rendering and reliability -->
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

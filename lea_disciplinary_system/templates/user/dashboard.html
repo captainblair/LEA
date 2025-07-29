@@ -1,0 +1,179 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+  <!-- Welcome Card -->
+  <div class="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden">
+    <div class="px-4 py-5 sm:p-6">
+      <div class="flex items-center">
+        <div class="flex-shrink-0 bg-indigo-500 rounded-md p-3">
+          <i class="fas fa-user text-white text-xl"></i>
+        </div>
+        <div class="ml-5 flex-1">
+          <h3 class="text-lg font-medium text-gray-900 dark:text-white">Welcome back, {{ user.get_full_name|default:user.username }}!</h3>
+          <p class="text-sm text-gray-500 dark:text-gray-400">
+            {% if user.center %}
+              {{ user.center.name }} Member
+            {% else %}
+              No center assigned
+            {% endif %}
+          </p>
+        </div>
+        <div>
+          <span class="px-3 py-1 rounded-full text-sm font-medium 
+            {% if compliance_status %}bg-green-100 dark:bg-green-800/20 text-green-800 dark:text-green-300{% else %}bg-yellow-100 dark:bg-yellow-800/20 text-yellow-800 dark:text-yellow-300{% endif %}">
+            {% if compliance_status %}Compliant{% else %}Needs Improvement{% endif %}
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Attendance Summary -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <!-- Physical Sessions -->
+    <div class="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden">
+      <div class="px-4 py-5 sm:p-6">
+        <div class="flex items-center">
+          <div class="flex-shrink-0 bg-blue-500 rounded-md p-3"><i class="fas fa-users text-white"></i></div>
+          <!-- THE FIX: Replaced hardcoded "/2" with the dynamic total -->
+          <div class="ml-5 flex-1"><h4 class="text-sm font-medium text-gray-500 dark:text-gray-400">Physical Sessions</h4><p class="text-2xl font-semibold text-gray-900 dark:text-white">{{ physical_attended }}/{{ physical_total }}</p></div>
+        </div>
+        <div class="mt-4 w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5"><div class="bg-blue-600 h-2.5 rounded-full" style="width: {{ physical_percentage }}%"></div></div>
+      </div>
+    </div>
+    <!-- Online Sessions -->
+    <div class="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden">
+      <div class="px-4 py-5 sm:p-6">
+        <div class="flex items-center">
+          <div class="flex-shrink-0 bg-purple-500 rounded-md p-3"><i class="fas fa-laptop text-white"></i></div>
+          <!-- THE FIX: Replaced hardcoded "/3" with the dynamic total -->
+          <div class="ml-5 flex-1"><h4 class="text-sm font-medium text-gray-500 dark:text-gray-400">Online Sessions</h4><p class="text-2xl font-semibold text-gray-900 dark:text-white">{{ online_attended }}/{{ online_total }}</p></div>
+        </div>
+        <div class="mt-4 w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5"><div class="bg-purple-600 h-2.5 rounded-full" style="width: {{ online_percentage }}%"></div></div>
+      </div>
+    </div>
+    <!-- Meetups -->
+    <div class="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden">
+      <div class="px-4 py-5 sm:p-6">
+        <div class="flex items-center">
+          <div class="flex-shrink-0 bg-green-500 rounded-md p-3"><i class="fas fa-handshake text-white"></i></div>
+          <!-- THE FIX: Replaced hardcoded "/2" with the dynamic total -->
+          <div class="ml-5 flex-1"><h4 class="text-sm font-medium text-gray-500 dark:text-gray-400">Monthly Meetups</h4><p class="text-2xl font-semibold text-gray-900 dark:text-white">{{ meetups_attended }}/{{ meetups_total }}</p></div>
+        </div>
+        <div class="mt-4 w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5"><div class="bg-green-600 h-2.5 rounded-full" style="width: {{ meetups_percentage }}%"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Attendance Chart -->
+  <div class="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden">
+    <div class="px-4 py-5 sm:p-6">
+      <h3 class="text-lg font-medium text-gray-900 dark:text-white">Your Attendance Trend (Last 30 Days)</h3>
+      <div class="mt-4"><canvas id="attendanceChart" height="120"></canvas></div>
+    </div>
+  </div>
+
+  <!-- Recent Attendance -->
+  <div class="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden">
+    <div class="px-4 py-5 sm:px-6 border-b border-gray-200 dark:border-gray-700">
+      <h3 class="text-lg font-medium text-gray-900 dark:text-white">Recent Attendance</h3>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-600">
+        <thead class="bg-gray-50 dark:bg-gray-700">
+          <tr>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Date</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Type</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Status</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-700">
+          <!-- Your original, beautiful loop. This will now work correctly. -->
+          {% for record in recent_attendance %}
+          <tr>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ record.date|date:"M d, Y" }}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{{ record.get_session_type_display }}</td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+              {% if record.status == 'present' %}bg-green-100 text-green-800 dark:bg-green-800/20 dark:text-green-300{% else %}bg-red-100 text-red-800 dark:bg-red-800/20 dark:text-red-300{% endif %}">
+              {{ record.get_status_display }}
+              </span>
+            </td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="3" class="text-center py-4 text-gray-500">No recent attendance records found.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+
+{% block extra_js %}
+{{ chart_labels|json_script:"chart-labels-data" }}
+{{ chart_data|json_script:"chart-data-data" }}
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const isDarkMode = document.documentElement.classList.contains('dark');
+  const gridColor = isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
+  const tickColor = isDarkMode ? 'rgb(156, 163, 175)' : 'rgb(107, 114, 128)';
+  const labelColor = isDarkMode ? 'rgb(203, 213, 225)' : 'rgb(55, 65, 81)';
+
+  const canvasElement = document.getElementById('attendanceChart');
+  if (canvasElement) {
+    try {
+      const labelsData = JSON.parse(document.getElementById('chart-labels-data').textContent);
+      const chartData = JSON.parse(document.getElementById('chart-data-data').textContent);
+      
+      const ctx = canvasElement.getContext('2d');
+      
+      new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: labelsData,
+          datasets: [{
+            label: 'Attendance',
+            data: chartData,
+            backgroundColor: 'rgba(79, 70, 229, 0.2)',
+            borderColor: 'rgba(79, 70, 229, 1)',
+            borderWidth: 2,
+            tension: 0.3,
+            fill: true,
+            pointBackgroundColor: 'rgba(79, 70, 229, 1)',
+            pointBorderColor: '#fff',
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              beginAtZero: true, max: 1.1, min: -0.1,
+              ticks: { stepSize: 1, color: tickColor, callback: function(value) { if (value === 1) return 'Present'; if (value === 0) return 'Absent'; return null; }},
+              grid: { color: gridColor, drawBorder: false }
+            },
+            x: {
+              ticks: { color: tickColor },
+              grid: { display: false }
+            }
+          },
+          plugins: {
+            legend: { display: false },
+            tooltip: { callbacks: { label: function(context) { return context.raw === 1 ? 'Present' : 'Absent'; } } }
+          }
+        }
+      });
+    } catch (e) {
+      console.error("Chart.js failed to initialize:", e);
+    }
+  }
+});
+</script>
+{% endblock %}

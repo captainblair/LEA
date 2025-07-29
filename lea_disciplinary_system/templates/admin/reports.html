@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Reports{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto">
+  <div class="bg-white shadow rounded-lg overflow-hidden">
+    <div class="px-4 py-5 sm:px-6 border-b border-gray-200">
+      <h3 class="text-lg leading-6 font-medium text-gray-900">Attendance Reports</h3>
+      <p class="mt-1 text-sm text-gray-500">Generate and download attendance reports</p>
+    </div>
+    <div class="px-4 py-5 sm:p-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <div class="border border-gray-200 rounded-lg p-4">
+          <h4 class="text-sm font-medium text-gray-900 mb-2">Generate Monthly Report</h4>
+          <div class="flex space-x-2">
+            <select class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+              <option>Select Month</option>
+              {% for month in months %}
+              <option value="{{ month.value }}">{{ month.name }}</option>
+              {% endfor %}
+            </select>
+            <select class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+              <option>Select Center</option>
+              <option value="MSDP">MSDP Center</option>
+              <option value="Highway">Highway Center</option>
+              <option value="all">All Centers</option>
+            </select>
+            <button class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+              Generate
+            </button>
+          </div>
+        </div>
+        <div class="border border-gray-200 rounded-lg p-4">
+          <h4 class="text-sm font-medium text-gray-900 mb-2">Quick Reports</h4>
+          <div class="flex flex-wrap gap-2">
+            <button class="inline-flex items-center px-3 py-1 border border-transparent text-xs font-medium rounded shadow-sm text-white bg-indigo-600 hover:bg-indigo-700">
+              This Month
+            </button>
+            <button class="inline-flex items-center px-3 py-1 border border-transparent text-xs font-medium rounded shadow-sm text-white bg-green-600 hover:bg-green-700">
+              Last Month
+            </button>
+            <button class="inline-flex items-center px-3 py-1 border border-transparent text-xs font-medium rounded shadow-sm text-white bg-purple-600 hover:bg-purple-700">
+              Non-Compliant
+            </button>
+            <button class="inline-flex items-center px-3 py-1 border border-transparent text-xs font-medium rounded shadow-sm text-white bg-yellow-600 hover:bg-yellow-700">
+              Warning List
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="border border-gray-200 rounded-lg overflow-hidden">
+        <div class="px-4 py-3 bg-gray-50 border-b border-gray-200 flex justify-between items-center">
+          <h4 class="text-sm font-medium text-gray-900">Generated Reports</h4>
+          <div class="text-sm text-gray-500">Sorted by most recent</div>
+        </div>
+        <ul class="divide-y divide-gray-200">
+          {% for report in reports %}
+          <li class="px-4 py-3 flex justify-between items-center hover:bg-gray-50">
+            <div>
+              <div class="text-sm font-medium text-gray-900">{{ report.name }}</div>
+              <div class="text-sm text-gray-500">Generated on {{ report.date|date:"M d, Y" }} | {{ report.center }}</div>
+            </div>
+            <div class="flex space-x-2">
+              <button class="text-indigo-600 hover:text-indigo-900 text-sm font-medium">
+                Download
+              </button>
+              <button class="text-red-600 hover:text-red-900 text-sm font-medium">
+                Delete
+              </button>
+            </div>
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

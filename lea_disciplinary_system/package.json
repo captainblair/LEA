@@ -1,0 +1,18 @@
+{
+  "name": "lea_disciplinary_system",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "tailwindcss -i ./lea_app/static/css/main.css -o ./lea_app/static/css/output.css",
+    "watch": "tailwindcss -i ./lea_app/static/css/main.css -o ./lea_app/static/css/output.css --watch"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@tailwindcss/forms": "^0.5.10",
+    "@tailwindcss/typography": "^0.5.16",
+    "tailwindcss": "^3.4.1"
+  }
+}

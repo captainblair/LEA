@@ -1,0 +1,184 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}LEA Disciplinary System{% endblock %}
+
+{% block content %}
+
+<div class="min-h-screen bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
+  <!-- Hero Section -->
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-32 text-center">
+    <div class="mx-auto max-w-3xl">
+      <h1 class="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-6">
+        <span class="text-indigo-600">LEA</span> Disciplinary Management System
+      </h1>
+      <p class="text-xl text-gray-600 dark:text-gray-300 mb-10">
+        Efficient attendance tracking and compliance monitoring for your organization
+      </p>
+      
+      {% if user.is_authenticated %}
+        <!-- Authenticated User Actions -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-2xl mx-auto">
+          {% if user.is_admin %}
+            <a href="{% url 'admin_dashboard' %}" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-lg font-medium transition-colors">
+              Admin Dashboard
+            </a>
+            <a href="{% url 'members' %}" class="bg-white hover:bg-gray-50 border border-indigo-600 text-indigo-600 px-6 py-3 rounded-lg font-medium transition-colors">
+              Manage Members
+            </a>
+            <a href="{% url 'reports' %}" class="bg-white hover:bg-gray-50 border border-indigo-600 text-indigo-600 px-6 py-3 rounded-lg font-medium transition-colors">
+              View Reports
+            </a>
+          {% else %}
+            <a href="{% url 'dashboard' %}" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-lg font-medium transition-colors">
+              My Dashboard
+            </a>
+            <a href="{% url 'attendance' %}" class="bg-white hover:bg-gray-50 border border-indigo-600 text-indigo-600 px-6 py-3 rounded-lg font-medium transition-colors">
+              Mark Attendance
+            </a>
+            <a href="{% url 'profile' %}" class="bg-white hover:bg-gray-50 border border-indigo-600 text-indigo-600 px-6 py-3 rounded-lg font-medium transition-colors">
+              My Profile
+            </a>
+          {% endif %}
+        </div>
+      {% else %}
+        <!-- Guest User Actions -->
+        <div class="flex flex-col sm:flex-row justify-center gap-4">
+          <a href="{% url 'login' %}" class="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3 rounded-lg font-medium transition-colors">
+              Member Login
+          </a>
+          <a href="{% url 'signup' %}" class="bg-white hover:bg-gray-50 border border-indigo-600 text-indigo-600 px-8 py-3 rounded-lg font-medium transition-colors">
+              Register
+          </a>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Quick Stats Section -->
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden">
+      <div class="grid md:grid-cols-4 divide-y md:divide-y-0 md:divide-x divide-gray-200 dark:divide-gray-700">
+        <div class="p-6 text-center">
+          <p class="text-3xl font-bold text-indigo-600">0</p>
+          <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Members</p>
+        </div>
+        <div class="p-6 text-center">
+          <p class="text-3xl font-bold text-indigo-600">0%</p>
+          <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Compliance Rate</p>
+        </div>
+        <div class="p-6 text-center">
+          <p class="text-3xl font-bold text-indigo-600">0/0</p>
+          <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Today's Attendance</p>
+        </div>
+        <div class="p-6 text-center">
+          <p class="text-3xl font-bold text-indigo-600">0</p>
+          <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Needs Attention</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Role-Based Information -->
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <h2 class="text-2xl font-bold text-center text-gray-900 dark:text-white mb-8">Getting Started</h2>
+    <div class="grid md:grid-cols-3 gap-8">
+      <!-- For Members -->
+      <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md border-t-4 border-indigo-500">
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-3 flex items-center">
+          <span class="bg-indigo-100 text-indigo-800 p-2 rounded-full mr-3">
+            <i class="fas fa-user text-sm"></i>
+          </span>
+          For Members
+        </h3>
+        <ul class="space-y-2 text-gray-600 dark:text-gray-300">
+          <li class="flex items-start">
+            <i class="fas fa-check-circle text-indigo-500 mt-1 mr-2 text-sm"></i>
+            <span>Mark your weekly attendance</span>
+          </li>
+          <li class="flex items-start">
+            <i class="fas fa-check-circle text-indigo-500 mt-1 mr-2 text-sm"></i>
+            <span>Track your compliance status</span>
+          </li>
+          <li class="flex items-start">
+            <i class="fas fa-check-circle text-indigo-500 mt-1 mr-2 text-sm"></i>
+            <span>Update your profile information</span>
+          </li>
+        </ul>
+        {% if not user.is_authenticated %}
+          <a href="{% url 'login' %}" class="mt-4 inline-block text-sm font-medium text-indigo-600 hover:text-indigo-500">
+            Member Login →
+          </a>
+        {% endif %}
+      </div>
+      
+      <!-- For Committee -->
+      <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md border-t-4 border-purple-500">
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-3 flex items-center">
+          <span class="bg-purple-100 text-purple-800 p-2 rounded-full mr-3">
+            <i class="fas fa-users text-sm"></i>
+          </span>
+          For Committee
+        </h3>
+        <ul class="space-y-2 text-gray-600 dark:text-gray-300">
+          <li class="flex items-start">
+            <i class="fas fa-check-circle text-purple-500 mt-1 mr-2 text-sm"></i>
+            <span>Monitor member attendance</span>
+          </li>
+          <li class="flex items-start">
+            <i class="fas fa-check-circle text-purple-500 mt-1 mr-2 text-sm"></i>
+            <span>Generate compliance reports</span>
+          </li>
+          <li class="flex items-start">
+            <i class="fas fa-check-circle text-purple-500 mt-1 mr-2 text-sm"></i>
+            <span>Manage disciplinary cases</span>
+          </li>
+        </ul>
+        {% if user.is_authenticated and user.is_admin %}
+          <a href="{% url 'admin_dashboard' %}" class="mt-4 inline-block text-sm font-medium text-purple-600 hover:text-purple-500">
+            Committee Dashboard →
+          </a>
+        {% endif %}
+      </div>
+      
+      <!-- For Leadership -->
+      <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md border-t-4 border-green-500">
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-3 flex items-center">
+          <span class="bg-green-100 text-green-800 p-2 rounded-full mr-3">
+            <i class="fas fa-user-shield text-sm"></i>
+          </span>
+          For Leadership
+        </h3>
+        <ul class="space-y-2 text-gray-600 dark:text-gray-300">
+          <li class="flex items-start">
+            <i class="fas fa-check-circle text-green-500 mt-1 mr-2 text-sm"></i>
+            <span>View organization-wide analytics</span>
+          </li>
+          <li class="flex items-start">
+            <i class="fas fa-check-circle text-green-500 mt-1 mr-2 text-sm"></i>
+            <span>Access detailed reports</span>
+          </li>
+          <li class="flex items-start">
+            <i class="fas fa-check-circle text-green-500 mt-1 mr-2 text-sm"></i>
+            <span>Configure system settings</span>
+          </li>
+        </ul>
+        {% if user.is_authenticated and user.is_admin %}
+          <a href="{% url 'settings' %}" class="mt-4 inline-block text-sm font-medium text-green-600 hover:text-green-500">
+            System Settings →
+          </a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Include Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+<style>
+  .border-t-4 {
+    border-top-width: 4px;
+  }
+</style>
+{% endblock %}
